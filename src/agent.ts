@@ -1,0 +1,26 @@
+import { addMessages, getMessages } from './memory'
+import { logMessage, showLoader } from './ui'
+import { runLLM } from './llm'
+
+export const runAgent = async ({
+  userMessage,
+  tools,
+}: {
+  userMessage: string
+  tools: any[]
+}) => {
+  await addMessages([{ role: 'user', content: userMessage }])
+
+  const loader = showLoader('thinking...')
+
+  const history = await getMessages()
+  const response = await runLLM({
+    messages: history,
+    tools,
+  })
+
+  await addMessages([response])
+  logMessage(response)
+  loader.stop()
+  return await getMessages()
+}
